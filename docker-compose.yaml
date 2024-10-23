@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  app_bio:
+    build: ./backend/
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=jdbc:mysql://bio-db:3306/bio-db?createDatabaseIfNoExist=true
+      - DATABASE_USERNAME=root
+      - DATABASE_PASSWORD=nacho
+    depends_on:
+      - bio-db
+  bio-db:
+    container_name: bio-db
+    image: mysql:8.0.33
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: nacho
+      MYSQL_PASSWORD: nacho
+      MYSQL_DATABASE: bio-db
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./my.cnf:/etc/mysql/my.cnf
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 10
+volumes:
+  db_data:
